@@ -1,5 +1,6 @@
-streamlit>=1.30
+streamlit==1.56.0
 numpy
 pandas
 plotly
 scikit-learn
+yfinance
