@@ -9,8 +9,14 @@ st.title("Crude Oil Price Predictor")
 
 # Load data
 df = pd.read_csv("data/latest_data.csv")
+st.write(df.columns)
+prices = df["Price"].values
 prices = df["Close"].values
 
+# Fix column name
+df["Price"] = df["Price"].replace(',', '', regex=True).astype(float)
+
+prices = df["Price"].values
 # Simple prediction logic
 current_price = prices[-1]
 prediction = current_price * 1.01  # dummy +1%
