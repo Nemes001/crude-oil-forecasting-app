@@ -1,32 +1,15 @@
-from tensorflow.keras.models import load_model
-import numpy as np
+def load_model_file():
+    return None
 
-def load_models():
-    cbam = load_model("model/cbam_cnn.h5")
-    mc = load_model("model/mc_cnn.h5")
-    gcn = load_model("model/gcn.h5")
-    return cbam, mc, gcn
+def predict(model, input_data):
+    return float(input_data[0][-1][0] * 1.01)  # simple +1% prediction
 
-def preprocess(data, window_size=30):
-    return np.array(data[-window_size:]).reshape(1, window_size, 1)
-
-def make_prediction(model, input_data):
-    return float(model.predict(input_data)[0][0])
-
-def forecast_future(model, data, days=5):
-    predictions = []
-    temp = data.copy()
+def forecast_future(model, input_data, days=5):
+    preds = []
+    val = input_data[0][-1][0]
 
     for _ in range(days):
-        pred = model.predict(temp)[0][0]
-        predictions.append(pred)
-        temp = np.append(temp[:,1:,:], [[[pred]]], axis=1)
+        val = val * 1.01
+        preds.append(val)
 
-    return predictions
-
-def generate_signal(current, predicted):
-    if predicted > current:
-        return "BUY"
-    elif predicted < current:
-        return "SELL"
-    return "HOLD"
+    return preds
