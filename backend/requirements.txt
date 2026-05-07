@@ -1,0 +1,13 @@
+
+# API
+fastapi==0.115.0
+uvicorn==0.30.6
+ 
+# Deep learning
+tensorflow==2.17.0
+ 
+# Data
+yfinance==0.2.44
+pandas==2.2.2
+numpy==1.26.4
+scikit-learn==1.5.1

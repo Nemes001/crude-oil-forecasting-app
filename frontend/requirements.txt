@@ -1,0 +1,12 @@
+# UI
+streamlit==1.38.0
+
+# Charts
+plotly==5.24.1
+
+# API calls
+requests==2.32.3
+
+# Market data (for chart only)
+yfinance==0.2.44
+pandas==2.2.2
