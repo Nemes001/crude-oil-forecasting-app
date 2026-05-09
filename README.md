@@ -1,15 +1,30 @@
-# WTI Crude Oil Price Predictor
+---
+title: WTI Crude Oil Predictor API
+emoji: 🛢
+colorFrom: blue
+colorTo: green
+sdk: docker
+pinned: false
+---
+
+# 🛢 WTI Crude Oil Price Predictor
 
 A deep learning system for WTI crude oil price forecasting using three architectures — CBAM-CNN, Multi-Channel CNN, and Graph Convolutional Network — served via a FastAPI backend and a Streamlit frontend.
+
+> **Motivation:** Escalating geopolitical tensions, OPEC+ supply decisions, and macroeconomic uncertainties have introduced unprecedented volatility into global energy markets, making accurate crude oil price forecasting more critical than ever.
 
 ---
 
 ## Project structure
 
 ```
-crude-oil-predictor/
+crude-oil-forecasting-app/
 ├── backend/
 │   ├── api.py                        ← FastAPI server
+│   ├── cbam_cnn_pure.py              ← CBAM-CNN training script
+│   ├── mc_cnn_crude_oil.py           ← MC-CNN training script
+│   ├── gcn_tensorflow.py             ← GCN training script
+│   ├── crude_oil_preprocessing.py    ← data pipeline
 │   ├── models/
 │   │   ├── cbam_cnn.keras
 │   │   ├── cbam_cnn_delta_stats.npy
@@ -25,9 +40,12 @@ crude-oil-predictor/
 │   └── requirements.txt
 │
 ├── notebooks/
-│   ├── EDA.ipynb
-│   └── model_comparison.ipynb
+│   ├── EDA.ipynb                     ← exploratory data analysis
+│   └── model_comparison.ipynb        ← model comparison
 │
+├── hf_app.py                         ← Hugging Face Spaces entry point
+├── Dockerfile                        ← HF Docker deployment
+├── requirements.txt                  ← HF dependencies
 ├── .gitignore
 └── README.md
 ```
@@ -42,66 +60,40 @@ crude-oil-predictor/
 | MC-CNN | 4 parallel CNN branches (kernel 3, 7, 14, 21) | 0.9590 | $1.95/bbl |
 | GCN | Graph convolutional network (Kipf & Welling) | 0.9589 | $1.95/bbl |
 
-All models use a **price delta prediction strategy** — predicting the next-day price change rather than the absolute price, then reconstructing the final price as `predicted_price = last_price + predicted_delta`.
+All models use a **price delta prediction strategy** — predicting the next-day price change rather than the absolute price, then reconstructing the final price as:
+```
+predicted_price = last_known_price + predicted_delta
+```
 
 ---
 
-## Getting started
+## Deployment
 
-### Step 1 — Clone the repo
+### Option 1 — Hugging Face Spaces (backend) + Streamlit Cloud (frontend)
 
+The backend is deployed on Hugging Face Spaces via Docker:
+- **API:** `https://your-username-crude-oil-predictor-api.hf.space`
+- **Dashboard:** `https://your-app.streamlit.app`
+
+### Option 2 — Run locally
+
+**Backend:**
 ```bash
-git clone https://github.com/your-username/crude-oil-predictor.git
-cd crude-oil-predictor
-```
-
-### Step 2 — Train models and save weights
-
-Before running the API, train each model locally and save the weights. Run the training scripts from your notebooks or terminal:
-
-```python
-# Inside your notebook — run preprocessing first
-exec(open("crude_oil_preprocessing.py").read())
-
-# Then run each model script
-exec(open("cbam_cnn_pure.py").read())       # saves cbam_cnn.keras
-exec(open("mc_cnn_crude_oil.py").read())    # saves mc_cnn.keras
-exec(open("gcn_tensorflow.py").read())      # saves gcn_tf_weights.weights.h5
-```
-
-Move the generated weight files into `backend/models/`:
-
-```
-cbam_cnn.keras
-cbam_cnn_delta_stats.npy
-mc_cnn.keras
-mc_cnn_delta_stats.npy
-gcn_tf_weights.weights.h5
-gcn_tf_adj.npy
-gcn_tf_delta_stats.npy
-```
-
-### Step 3 — Start the backend
-
-```bash
+conda create -n oilapi python=3.10 -y
+conda activate oilapi
+pip install tensorflow==2.17.0 fastapi uvicorn yfinance scikit-learn pandas matplotlib
 cd backend
-pip install -r requirements.txt
-uvicorn api:app --host 0.0.0.0 --port 8000
+python -m uvicorn api:app --host 0.0.0.0 --port 8000
 ```
 
-The API will start, load all model weights, fetch the latest WTI data from Yahoo Finance, and be ready in ~10 seconds.
-
-### Step 4 — Start the frontend
-
-Open a new terminal:
-
+**Frontend:**
 ```bash
 cd frontend
-pip install -r requirements.txt
+pip install streamlit plotly requests yfinance
 streamlit run streamlit_app.py
 ```
 
-Open your browser at `http://localhost:8501`.
+Open `http://localhost:8501` in your browser.
 
 ---
 
@@ -133,7 +125,7 @@ Open your browser at `http://localhost:8501`.
   },
   "signal":     "BUY",
   "signal_pct": 2.26,
-  "timestamp":  "2026-04-19T09:30:00"
+  "timestamp":  "2026-05-08T09:30:00"
 }
 ```
 
@@ -153,8 +145,8 @@ Open your browser at `http://localhost:8501`.
 |---|---|
 | Models | TensorFlow 2.17 / Keras |
 | API | FastAPI + Uvicorn |
-| Frontend | Streamlit |
-| Charts | Plotly |
+| Frontend | Streamlit + Plotly |
+| Deployment | Hugging Face Spaces (Docker) + Streamlit Cloud |
 | Data | yfinance + pandas |
 
 ---
