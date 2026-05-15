@@ -109,10 +109,10 @@ def build_gcn(window, num_feat):
         def __init__(self, out_ch, **kw):
             super().__init__(**kw); self.out_ch = out_ch
         def build(self, shape):
-            self.W = self.add_weight("W", shape=(shape[-1], self.out_ch),
-                                     initializer="glorot_uniform", trainable=True)
-            self.b = self.add_weight("b", shape=(self.out_ch,),
-                                     initializer="zeros", trainable=True)
+            self.W = self.add_weight(name="W", shape=(shape[-1], self.out_ch),
+                         initializer="glorot_uniform", trainable=True)
+            self.b = self.add_weight(name="b", shape=(self.out_ch,),
+                         initializer="zeros", trainable=True)
         def call(self, H, A): return tf.matmul(A, tf.matmul(H, self.W)) + self.b
         def get_config(self):
             c = super().get_config(); c["out_ch"] = self.out_ch; return c
